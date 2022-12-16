@@ -74,7 +74,43 @@ struct ContentView: View {
                             }
                             Spacer()
                             VStack(alignment: .leading) {
-                              
+                                Button(
+                                 "Roll",
+                                 action: {
+                                   //roll the dice to see which skater moves and how far
+                                   skaterSelected = randomDiceRoll()
+                                   skaterStrides = randomDiceRoll()
+                                   skaterSelectedText = "Skater " + String(skaterSelected)
+                                   skaterStridesText  = "Moves " + String(skaterStrides) + " Strides"
+                                   
+                                   //this code block moves the skater
+                                   var skaterPosChange = CGFloat(skaterStrides * 10)
+                                     switch skaterSelected {
+                                     case 1:
+                                         skater1Ypos = skater1Ypos + skaterPosChange
+                                     case 2:
+                                         skater2Ypos = skater2Ypos + skaterPosChange
+                                     case 3:
+                                         skater3Ypos = skater3Ypos + skaterPosChange
+                                     case 4:
+                                         skater4Ypos = skater4Ypos + skaterPosChange
+                                     case 5:
+                                         skater5Ypos = skater5Ypos + skaterPosChange
+                         
+                                     default:
+                                         // same as case 6 = move all skaters
+                                             skater1Ypos = skater1Ypos + skaterPosChange
+                                             skater2Ypos = skater2Ypos + skaterPosChange
+                                             skater3Ypos = skater3Ypos + skaterPosChange
+                                             skater4Ypos = skater4Ypos + skaterPosChange
+                                             skater5Ypos = skater5Ypos + skaterPosChange
+                                     }
+                               })
+                               .padding()
+                               .background(Color(red: 0, green: 0, blue: 0.5))
+                               .foregroundColor(.white)
+                               .cornerRadius(15)
+                                   
             
                             } //  VStack
                             
@@ -98,4 +134,9 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
+}
+
+func randomDiceRoll() -> Int {
+    // This function returns a random number between 1 and 6
+    return Int(arc4random_uniform(6) + 1)
 }
