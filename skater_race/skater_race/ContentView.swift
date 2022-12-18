@@ -20,6 +20,8 @@ struct ContentView: View {
     @State var skater4Ypos: CGFloat = -550
     @State var skater5Ypos: CGFloat = -550
     
+    @State private var showSheet = false
+    @State private var strWhoWon: String = ""
     
     var body: some View {
         VStack{
@@ -84,7 +86,7 @@ struct ContentView: View {
                                    skaterStridesText  = "Moves " + String(skaterStrides) + " Strides"
                                    
                                    //this code block moves the skater
-                                   var skaterPosChange = CGFloat(skaterStrides * 10)
+                                   let skaterPosChange = CGFloat(skaterStrides * 10)
                                      switch skaterSelected {
                                      case 1:
                                          skater1Ypos = skater1Ypos + skaterPosChange
@@ -105,22 +107,39 @@ struct ContentView: View {
                                              skater4Ypos = skater4Ypos + skaterPosChange
                                              skater5Ypos = skater5Ypos + skaterPosChange
                                      }
+                                     
+                                     
+                                     // Check to see if any skater crossed the finish line
+                                      var haveWinner: Bool = false
+                                      strWhoWon = ""
+                                      haveWinner = checkForWinner(skater1Distance: skater1Ypos, skater2Distance: skater2Ypos, skater3Distance: skater3Ypos, skater4Distance: skater4Ypos, skater5Distance: skater5Ypos, strWinners: &strWhoWon )
+                                     if haveWinner {
+                                         showSheet = true
+                                         //reset the game
+                                         skater1Ypos = -550
+                                         skater2Ypos = -550
+                                         skater3Ypos = -550
+                                         skater4Ypos = -550
+                                         skater5Ypos = -550
+                                     }
                                })
                                .padding()
                                .background(Color(red: 0, green: 0, blue: 0.5))
                                .foregroundColor(.white)
                                .cornerRadius(15)
-                                   
+                               .sheet(isPresented: $showSheet) {
+                                   SheetContentView(strWinnerText: strWhoWon)
+                               }
             
-                            } //  VStack
+                            } // :- VStack
                             
-                        } //  HStack
+                        } //  :- HStack
                         .padding()
                         .foregroundColor(.primary)
                         .background(Color.primary
                             .colorInvert()
                             .opacity(0.75))
-                    } // ZStack
+                    } // :- ZStack
                 }
                 
 
@@ -136,7 +155,91 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
+struct SheetContentView: View {
+      let strWinnerText: String
+      @Environment(\.dismiss) var dismiss
+
+      var body: some View {
+          VStack(alignment: .center) {
+              Image("winner")
+                  .frame(width: 100, height: 100, alignment: .center)
+          }
+          VStack(alignment: .center) {
+              Text(strWinnerText)
+                  .font(.headline)
+              Button(
+                  "Press to Play Again",
+                  action: {
+                      dismiss()
+                     
+                  })
+              .font(.title)
+              .padding()
+              
+          }
+      }
+  }
+
+
+
+
+
+
 func randomDiceRoll() -> Int {
     // This function returns a random number between 1 and 6
     return Int(arc4random_uniform(6) + 1)
 }
+
+func checkForWinner(skater1Distance: CGFloat, skater2Distance: CGFloat, skater3Distance: CGFloat, skater4Distance: CGFloat, skater5Distance: CGFloat, strWinners: inout String) -> Bool {
+    
+    let finishLineYPos: CGFloat = 0
+    var nbrWinners: Int = 0
+    
+    if skater1Distance > finishLineYPos {
+        nbrWinners+=1
+        strWinners = "1"
+        
+    }
+    if skater2Distance > finishLineYPos {
+        if nbrWinners > 0{
+            strWinners = strWinners + ",2"
+        }
+        else {strWinners = strWinners + "2"}
+        nbrWinners+=1
+    }
+    if skater3Distance > finishLineYPos {
+        if nbrWinners > 0{
+            strWinners = strWinners + ",3"
+        }
+        else {strWinners = strWinners + "3"}
+        nbrWinners+=1
+    }
+    if skater4Distance > finishLineYPos {
+        if nbrWinners > 0{
+            strWinners = strWinners + ",4"
+        }
+        else{strWinners = strWinners + "4"}
+        nbrWinners+=1
+    }
+    if skater5Distance > finishLineYPos {
+        if nbrWinners > 0{
+            strWinners = strWinners + ",5"
+        }
+        else {strWinners = strWinners + "5"}
+        nbrWinners+=1
+    }
+    
+    if nbrWinners > 0 {
+        strWinners = "Skater" + strWinners + "won the race"
+        return true
+    }
+    else if nbrWinners > 1 {
+        strWinners = "Skaters" + strWinners + "all won the race"
+        return true
+    }
+    else {
+        return false
+    }
+}
+    
+
