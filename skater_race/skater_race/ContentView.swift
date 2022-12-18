@@ -1,6 +1,10 @@
 //
 //  ContentView.swift
-//  skater_race
+//  skater_race: A race game based on the horse racing dice and board game
+//    game play: 1. Pick one of the five skaters to win the race
+//               2. Roll the dice and the first number 1-6 decides which skater moves. If 6 ALL skaters move.
+//                  The second number of 1-6 decides how far the selected skater moves
+//               3. Keep rolling until at least one skater crosses the finish line
 //
 //  Created by James on 12/15/22.
 //
@@ -20,6 +24,7 @@ struct ContentView: View {
     @State var skater4Ypos: CGFloat = -550
     @State var skater5Ypos: CGFloat = -550
     
+    // State variables to show the winners
     @State private var showSheet = false
     @State private var strWhoWon: String = ""
     
@@ -67,6 +72,7 @@ struct ContentView: View {
                             Text("FINISH")
                             .font(.headline)
                         }
+                        // This part of the interface show the Roll button and the dice values
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(skaterSelectedText)
@@ -79,7 +85,7 @@ struct ContentView: View {
                                 Button(
                                  "Roll",
                                  action: {
-                                   //roll the dice to see which skater moves and how far
+                                   //roll the dice to see which skater moves and how far they move
                                    skaterSelected = randomDiceRoll()
                                    skaterStrides = randomDiceRoll()
                                    skaterSelectedText = "Skater " + String(skaterSelected)
@@ -114,6 +120,7 @@ struct ContentView: View {
                                       strWhoWon = ""
                                       haveWinner = checkForWinner(skater1Distance: skater1Ypos, skater2Distance: skater2Ypos, skater3Distance: skater3Ypos, skater4Distance: skater4Ypos, skater5Distance: skater5Ypos, strWinners: &strWhoWon )
                                      if haveWinner {
+                                         // This will tell the winner screen to display
                                          showSheet = true
                                          //reset the game
                                          skater1Ypos = -550
@@ -155,6 +162,7 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
+// This is the winner display sheet
 struct SheetContentView: View {
       let strWinnerText: String
       @Environment(\.dismiss) var dismiss
@@ -183,15 +191,15 @@ struct SheetContentView: View {
 
 
 
-
-
 func randomDiceRoll() -> Int {
     // This function returns a random number between 1 and 6
     return Int(arc4random_uniform(6) + 1)
 }
 
 func checkForWinner(skater1Distance: CGFloat, skater2Distance: CGFloat, skater3Distance: CGFloat, skater4Distance: CGFloat, skater5Distance: CGFloat, strWinners: inout String) -> Bool {
+    // This function checks to see which skaters crossed the finish line
     
+    // skaters start at a -550 Y position so the finishline is at 0
     let finishLineYPos: CGFloat = 0
     var nbrWinners: Int = 0
     
@@ -229,12 +237,12 @@ func checkForWinner(skater1Distance: CGFloat, skater2Distance: CGFloat, skater3D
         nbrWinners+=1
     }
     
-    if nbrWinners > 0 {
-        strWinners = "Skater" + strWinners + "won the race"
+    if nbrWinners == 1 {
+        strWinners = "Skater " + strWinners + " won the race"
         return true
     }
     else if nbrWinners > 1 {
-        strWinners = "Skaters" + strWinners + "all won the race"
+        strWinners = "Skaters " + strWinners + " won the race"
         return true
     }
     else {
